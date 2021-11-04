@@ -6,7 +6,7 @@ import numpy as np
 # SET UP ENVIRONMENT
 # You can also launch the simulator separately
 # in that case, you don't need to pass a `conf` object
-exe_path = f"/content/AV-Driving/ donkey-car-sim-usi/donkey-sim-linux.x86_64"
+exe_path = f"/content/AV-Driving/donkey-car-sim-usi/donkey-sim-linux.x86_64"
 port = 9091
 
 env_id = "donkey-warehouse-v0"
