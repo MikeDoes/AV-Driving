@@ -98,7 +98,7 @@ class KerasVGG16(KerasPilot):
 
         input_shape = adjust_input_shape(input_shape, roi_crop)
         img_in = Input(shape=input_shape, name='img_in')
-        self.image_processor = tf.keras.applications.VGG19(
+        self.image_processor = tf.keras.applications.VGG16(
             include_top=False,
             weights="vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5",
             input_tensor=input_shape,
