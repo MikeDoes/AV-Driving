@@ -40,14 +40,14 @@ class KerasPilot(object):
         pass
 
     def set_optimizer(self, optimizer_type, rate, decay):
-        if optimizer_type == "adam":
-            self.model.optimizer = keras.optimizers.Adam(lr=rate, decay=decay)
-        elif optimizer_type == "sgd":
-            self.model.optimizer = keras.optimizers.SGD(lr=rate, decay=decay)
-        elif optimizer_type == "rmsprop":
-            self.model.optimizer = keras.optimizers.RMSprop(lr=rate, decay=decay)
-        else:
-            raise Exception("unknown optimizer type: %s" % optimizer_type)
+        # if optimizer_type == "adam":
+        self.model.optimizer = keras.optimizers.Adam(lr=rate, decay=decay)
+        # elif optimizer_type == "sgd":
+        #     self.model.optimizer = keras.optimizers.SGD(lr=rate, decay=decay)
+        # elif optimizer_type == "rmsprop":
+        #     self.model.optimizer = keras.optimizers.RMSprop(lr=rate, decay=decay)
+        # else:
+        #     raise Exception("unknown optimizer type: %s" % optimizer_type)
 
     def train(self, train_gen, val_gen,
               saved_model_path, epochs=100, steps=100, train_split=0.8,
@@ -98,7 +98,7 @@ class KerasVGG16(KerasPilot):
 
         input_shape = adjust_input_shape(input_shape, roi_crop)
         img_in = Input(shape=input_shape, name='img_in')
-        self.image_processor = tf.keras.applications.VGG16(
+        self.image_processor = tf.keras.applications.VGG19(
             include_top=False,
             weights="vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5",
             input_tensor=input_shape,
