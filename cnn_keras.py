@@ -11,6 +11,7 @@ from tensorflow.python.keras.layers.merge import concatenate
 from tensorflow.python.keras.layers import LSTM
 from tensorflow.python.keras.layers.wrappers import TimeDistributed as TD
 from tensorflow.python.keras.layers import Conv3D, MaxPooling3D, Cropping3D, Conv2DTranspose
+from tensorflow.python.keras.layers import GlobalAveragePooling2D
 
 import donkeycar as dk
 
@@ -95,27 +96,40 @@ class KerasVGG16(KerasPilot):
     '''
     def __init__(self, num_outputs=2, input_shape=(120, 160, 3), roi_crop=(0, 0), last_activation="linear", *args, **kwargs):
         super(KerasVGG16, self).__init__(*args, **kwargs)
-
+        drop = 0.2
+        self.seq_length = 5
+        self.image_d = input_shape[-1]
+        self.image_w = input_shape[1]
+        self.image_h = input_shape[0]
+        self.img_seq = []
         input_shape = adjust_input_shape(input_shape, roi_crop)
-        img_in = Input(shape=input_shape, name='img_in')
+        img_seq_shape = (self.seq_length,) + input_shape
+        img_in = Input(batch_shape = img_seq_shape, name='img_in')
+        # img_in = Input(shape=input_shape, name='img_in')
+        x = Sequential()
         self.image_processor = tf.keras.applications.VGG16(
             include_top=False,
             weights="vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5",
-            input_tensor=input_shape,
-            input_shape=None,
+            input_tensor=None,
+            input_shape=input_shape,
             pooling=None)
-        x = self.image_processor(img_in)
-        x = Flatten(name='flattened')(x)
-        x = Dense(100, activation='relu')(x)
-        x = Dropout(drop)(x)
-        x = Dense(50, activation='relu')(x)
-        x = Dropout(drop)(x)
 
-        outputs = []
-        for i in range(num_outputs):
-            outputs.append(Dense(1, activation=last_activation, name='n_outputs' + str(i))(x))
+        x.add(self.image_processor)
+        x.add(TD(GlobalAveragePooling2D()))
+        x.add(LSTM(128, return_sequences=True, name="LSTM_seq") )
+        x.add(TD(Dropout(.1)))
+        x.add(LSTM(128, return_sequences=False, name="LSTM_fin"))
+        # x = Flatten(name='flattened')(x)
+        x.add(Dense(100, activation='relu'))
+        x.add(Dropout(drop))
+        x.add(Dense(50, activation='relu'))
+        x.add(Dropout(drop))
 
-        self.model = Model(inputs=[img_in], outputs=outputs)
+        # outputs = []
+        # for i in range(num_outputs):
+        x.add(Dense(num_outputs, activation='tanh', name='n_outputs'))
+        self.model = x
+        # self.model = Model(inputs=[img_in], outputs=outputs)
         # self.model = default_n_linear(num_outputs, roi_crop, last_activation=last_activation)
         self.compile()
 
@@ -124,8 +138,17 @@ class KerasVGG16(KerasPilot):
                 loss='mse')
 
     def run(self, img_arr):
-        img_arr = img_arr.reshape((1,) + img_arr.shape)
-        outputs = self.model.predict(img_arr)
-        steering = outputs[0]
-        throttle = outputs[1]
-        return steering[0][0], throttle[0][0]
+        # if img_arr.shape[2] == 3 and self.image_d == 1:
+        # img_arr = dk.utils.rgb2gray(img_arr)
+
+        while len(self.img_seq) < self.seq_length:
+            self.img_seq.append(img_arr)
+
+        self.img_seq = self.img_seq[1:]
+        self.img_seq.append(img_arr)
+
+        img_arr = np.array(self.img_seq).reshape(1, self.seq_length, self.image_h, self.image_w, self.image_d )
+        outputs = self.model.predict([img_arr])
+        steering = outputs[0][0]
+        throttle = outputs[0][1]
+        return steering, throttle
