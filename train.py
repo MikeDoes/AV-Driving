@@ -37,6 +37,7 @@ from donkeycar.parts.datastore import Tub
 from my_keras import KerasLinear, KerasIMU,\
      KerasCategorical, KerasBehavioral, Keras3D_CNN,\
      KerasRNN_LSTM, KerasLatent, KerasLocalizer
+from cnn_keras import KerasVGG16
 from donkeycar.parts.augment import augment_image
 from donkeycar.utils import *
 
@@ -1064,6 +1065,8 @@ def my_get_model_by_type(model_type, cfg):
         kl = KerasCategorical(input_shape=input_shape, throttle_range=cfg.MODEL_CATEGORICAL_MAX_THROTTLE_RANGE, roi_crop=roi_crop)
     elif model_type == "latent":
         kl = KerasLatent(input_shape=input_shape)
+    elif model_type == "mega":
+        kl = KerasVGG16(input_shape=input_shape, roi_crop=roi_crop)
     elif model_type == "fastai":
         from donkeycar.parts.fastai import FastAiPilot
         kl = FastAiPilot()

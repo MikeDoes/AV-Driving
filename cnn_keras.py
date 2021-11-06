@@ -120,7 +120,6 @@ class KerasVGG16(KerasPilot):
         self.compile()
 
     def compile(self):
-
         self.model.compile(optimizer=self.optimizer,
                 loss='mse')
 
