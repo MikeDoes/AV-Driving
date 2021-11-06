@@ -94,7 +94,7 @@ class KerasVGG16(KerasPilot):
     The output is not bounded.
     '''
     def __init__(self, num_outputs=2, input_shape=(120, 160, 3), roi_crop=(0, 0), last_activation="linear", *args, **kwargs):
-        super(KerasLinear, self).__init__(*args, **kwargs)
+        super(KerasVGG16, self).__init__(*args, **kwargs)
 
         input_shape = adjust_input_shape(input_shape, roi_crop)
         img_in = Input(shape=input_shape, name='img_in')
