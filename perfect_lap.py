@@ -17,14 +17,20 @@ sleep(2.9)
 
 #Circular Turn
 keyboard.press(right)
-sleep(3)
+sleep(2.85)
 #slow down before inflection and sharp turn
 keyboard.release(up)
 sleep(1)
 #Inflection Turn
 keyboard.release(right)
 keyboard.press(left)
-sleep(1.98)
+
+sleep(0.2)
+keyboard.press(up)
+sleep(0.2)
+keyboard.release(up)
+
+sleep(1.55)
 
 #Sharp Turn
 keyboard.release(left)
@@ -33,9 +39,13 @@ sleep(1.6)
 
 #Accelerate back through the sharp turn
 keyboard.press(up)
-sleep(0.5)
+sleep(0.2)
 keyboard.release(up)
-sleep(1)
+sleep(0.2)
+keyboard.press(up)
+sleep(0.1)
+keyboard.release(up)
+sleep(1.7)
 
 
 #Straight line
